@@ -486,6 +486,7 @@
 				8C839AAC1BBDEDF000057447 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8C839AAD1BBDEDF000057447 /* Build configuration list for PBXNativeTarget "BlocBrowserTests" */ = {
 			isa = XCConfigurationList;
@@ -494,6 +495,7 @@
 				8C839AAF1BBDEDF000057447 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8C839AB01BBDEDF000057447 /* Build configuration list for PBXNativeTarget "BlocBrowserUITests" */ = {
 			isa = XCConfigurationList;
@@ -502,6 +504,7 @@
 				8C839AB21BBDEDF000057447 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
