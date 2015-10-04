@@ -40,7 +40,7 @@
     self.textField.returnKeyType = UIReturnKeyDone;
     self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
-    self.textField.placeholder = NSLocalizedString(@"Website URL", @"Placeholder text for web browser URL field");
+    self.textField.placeholder = NSLocalizedString(@"Search or Website URL", @"Placeholder text for web browser URL field");
     self.textField.backgroundColor = [UIColor colorWithWhite:220/255.0f alpha:1];
     self.textField.delegate = self;
     
@@ -113,8 +113,25 @@
 - (BOOL) textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
     
-    NSString *URLString = textField.text;
-    NSURL *URL = [NSURL URLWithString:URLString];
+    NSString *URLString;
+    
+    NSString *userString = textField.text;
+    NSRange spaceRange  = [userString rangeOfString:@" "];
+    NSRange periodRange = [userString rangeOfString:@"."];
+    
+    if ( spaceRange.location == NSNotFound ) {
+        if ( periodRange.location == NSNotFound ) {
+            URLString = [self wrapAndEncodeGoogleQueryToString:userString];
+        } else {
+            URLString = userString;
+        }
+    } else {
+        
+        URLString = [self wrapAndEncodeGoogleQueryToString:userString];
+    }
+    
+    
+    NSURL *URL= [NSURL URLWithString:URLString];
     NSString *correctURLScheme = @"https";
     
     if ( ![URL.scheme isEqualToString: correctURLScheme]) {
@@ -132,18 +149,7 @@
     }
     
     if (URL) {
-        NSURLSession *session = [NSURLSession sharedSession];
-        NSURLSessionDataTask *task = [session dataTaskWithURL:URL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-            if (!error) {
-                [self.webView loadData:data MIMEType:@"text/html" characterEncodingName:@"UTF-8" baseURL:URL];
-            } else {
-                NSLog(@"%@", [error localizedDescription] );
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self showUserError:error];
-                });
-            }
-        }];
-        [task resume];
+        [self loadWebDataWithSession: URL];
     }
     
     return NO;
@@ -184,6 +190,35 @@
         
     }
 }
+
+#pragma mark - Helper Methods
+
+- (void) loadWebDataWithSession:(NSURL *)URL {
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDataTask *task = [session dataTaskWithURL:URL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (!error) {
+            [self.webView loadData:data MIMEType:@"text/html" characterEncodingName:@"UTF-8" baseURL:URL];
+        } else {
+            NSLog(@"%@", [error localizedDescription] );
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self showUserError:error];
+            });
+        }
+    }];
+    [task resume];
+}
+
+- (NSString *) wrapAndEncodeGoogleQueryToString:(NSString *)textString {
+
+    NSString *googleBaseURL = @"https://google.com/search?q=";
+    NSString *query;
+    
+    query = textString;
+    NSString *searchString = [NSString stringWithFormat:@"%@%@", googleBaseURL, query];
+    return [searchString stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
+
+}
+
 
 #pragma mark - Alert Method
 
