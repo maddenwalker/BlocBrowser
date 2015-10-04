@@ -57,17 +57,19 @@
     self.reloadButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [self.reloadButton setEnabled:NO];
     
-    [self.backButton setTitle:NSLocalizedString(@"Back", "Back Command") forState:UIControlStateNormal];
-    [self.backButton addTarget:self.webView action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
+    [self.backButton setTitle:NSLocalizedString(@"Back", "Back Command")
+                     forState:UIControlStateNormal];
     
-    [self.forwardButton setTitle:NSLocalizedString(@"Forward", "Forward Command") forState:UIControlStateNormal];
-    [self.forwardButton addTarget:self.webView action:@selector(goForward) forControlEvents:UIControlEventTouchUpInside];
+    [self.forwardButton setTitle:NSLocalizedString(@"Forward", "Forward Command")
+                        forState:UIControlStateNormal];
     
-    [self.stopButton setTitle:NSLocalizedString(@"Stop", "Stop Command") forState:UIControlStateNormal];
-    [self.stopButton addTarget:self.webView action:@selector(stopLoading) forControlEvents:UIControlEventTouchUpInside];
+    [self.stopButton setTitle:NSLocalizedString(@"Stop", "Stop Command")
+                     forState:UIControlStateNormal];
     
-    [self.reloadButton setTitle:NSLocalizedString(@"Reload", "Reload Command") forState:UIControlStateNormal];
-    [self.reloadButton addTarget:self.webView action:@selector(reload) forControlEvents:UIControlEventTouchUpInside];
+    [self.reloadButton setTitle:NSLocalizedString(@"Reload", "Reload Command")
+                       forState:UIControlStateNormal];
+    
+    [self addButtonTargets];
     
     //load all of the views as subview
     for (UIView *viewToAdd in @[self.webView, self.textField, self.forwardButton, self.backButton, self.stopButton, self.reloadButton]) {
@@ -195,13 +197,21 @@
 
 - (void) loadWebDataWithSession:(NSURL *)URL {
     NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDataTask *task = [session dataTaskWithURL:URL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    NSURLSessionDataTask *task = [session dataTaskWithURL:URL
+                                        completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (!error) {
-            [self.webView loadData:data MIMEType:@"text/html" characterEncodingName:@"UTF-8" baseURL:URL];
+            
+            [self.webView loadData:data
+                          MIMEType:@"text/html"
+             characterEncodingName:@"UTF-8"
+                           baseURL:URL];
+            
         } else {
+            
             NSLog(@"%@", [error localizedDescription] );
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self showUserError:error];
+                
             });
         }
     }];
@@ -225,6 +235,7 @@
 - (void) showUserError:(NSError *)error {
     
     if (error.code != NSURLErrorCancelled) {
+        
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error", @"Error")
                                                                        message:[error localizedDescription]
                                                                 preferredStyle:UIAlertControllerStyleAlert];
@@ -247,23 +258,86 @@
     
     NSString *webPageTitle = [self.webView.title copy];
     if ([ webPageTitle length ]) {
+        
         self.title = webPageTitle;
+        
     } else {
+        
         self.title = self.webView.URL.absoluteString;
+        
     }
     
     if (self.webView.isLoading) {
+        
         [self.activityIndicator startAnimating];
+        
     } else {
+        
         [self.activityIndicator stopAnimating];
+        
     }
     
     self.backButton.enabled = [self.webView canGoBack];
     self.forwardButton.enabled = [self.webView canGoForward];
     self.stopButton.enabled = self.webView.isLoading;
-    self.reloadButton.enabled = !self.webView.isLoading;
+    self.reloadButton.enabled = !self.webView.isLoading && self.webView.URL;
     
 }
+
+- (void) resetWebView {
+    [self.webView removeFromSuperview];
+    
+    WKWebView *newWebView = [[WKWebView alloc] init];
+    newWebView.navigationDelegate = self;
+    [self.view addSubview:newWebView];
+    
+    self.webView = newWebView;
+    
+    [self addButtonTargets];
+    
+    self.textField.text = nil;
+    [self updateButtonsAndTitle];
+    
+}
+
+
+- (void) addButtonTargets {
+    for (UIButton *button in @[self.backButton, self.forwardButton, self.reloadButton, self.stopButton]) {
+        [button removeTarget:nil
+                      action:NULL
+            forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    [self.backButton addTarget:self.webView
+                        action:@selector(goBack)
+              forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.forwardButton addTarget:self.webView
+                           action:@selector(goForward)
+                 forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.stopButton addTarget:self.webView
+                        action:@selector(stopLoading)
+              forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.reloadButton addTarget:self.webView
+                          action:@selector(reload)
+                forControlEvents:UIControlEventTouchUpInside];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @end
