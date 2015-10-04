@@ -90,6 +90,10 @@
     
 }
 
+- (void) viewDidAppear:(BOOL)animated {
+    [self showUserWelcomeMessage];
+}
+
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     
@@ -251,6 +255,21 @@
     }
     
     [self updateButtonsAndTitle];
+}
+
+- (void) showUserWelcomeMessage {
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Welcome!", @"Welcome title")
+                                                                   message:NSLocalizedString(@"You are an amazing user and I am grateful you are here.", @"Welcome message that loves the user")
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *welcomeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"You're Welcome", @"grateful user response to my welcome alert")
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:nil];
+    
+    [alert addAction:welcomeAction];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+    
 }
 
 #pragma mark - Miscellaneous
