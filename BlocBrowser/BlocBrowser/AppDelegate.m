@@ -11,6 +11,8 @@
 
 @interface AppDelegate ()
 
+@property BOOL firstTimeLoad;
+
 @end
 
 @implementation AppDelegate
@@ -18,6 +20,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    self.firstTimeLoad = YES;
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
@@ -49,6 +53,14 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    
+    if (self.firstTimeLoad) {
+        UINavigationController *navigationVC = (UINavigationController *)self.window.rootViewController;
+        ViewController *broswerVC = [[navigationVC viewControllers] firstObject];
+        [broswerVC showUserWelcomeMessage];
+        self.firstTimeLoad = NO;
+    }
+    
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

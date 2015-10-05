@@ -90,10 +90,6 @@
     
 }
 
-- (void) viewDidAppear:(BOOL)animated {
-    [self showUserWelcomeMessage];
-}
-
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     
