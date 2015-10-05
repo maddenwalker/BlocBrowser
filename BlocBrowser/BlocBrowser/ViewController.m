@@ -15,10 +15,10 @@
 @property (strong, nonatomic) NSData *webData;
 @property (strong, nonatomic) UITextField *textField;
 
-@property (weak, nonatomic) UIButton *backButton;
-@property (weak, nonatomic) UIButton *forwardButton;
-@property (weak, nonatomic) UIButton *stopButton;
-@property (weak, nonatomic) UIButton *reloadButton;
+@property (strong, nonatomic) UIButton *backButton;
+@property (strong, nonatomic) UIButton *forwardButton;
+@property (strong, nonatomic) UIButton *stopButton;
+@property (strong, nonatomic) UIButton *reloadButton;
 @property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
 
 @end
