@@ -208,15 +208,28 @@
             
         } else {
             
-            NSLog(@"%@", [error localizedDescription] );
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self showUserError:error];
+            if ([URL.scheme isEqualToString:@"https"]) {
+                NSLog(@"Going to attempt to use an unsecure conneciton");
+                [self loadWebDataWithFallbackProperties: URL];
                 
-            });
+            } else {
+                NSLog(@"%@", [error localizedDescription] );
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self showUserError:error];
+                });
+            }
         }
     }];
     [task resume];
+    
 }
+
+- (void) loadWebDataWithFallbackProperties: (NSURL *)URL {
+    NSURLComponents *componentsOfURL = [[NSURLComponents alloc] initWithURL:URL resolvingAgainstBaseURL:NO];
+    NSURL *newURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@%@", componentsOfURL.host, componentsOfURL.path]];
+    [self loadWebDataWithSession:newURL];
+}
+
 
 - (NSString *) wrapAndEncodeGoogleQueryToString:(NSString *)textString {
 
