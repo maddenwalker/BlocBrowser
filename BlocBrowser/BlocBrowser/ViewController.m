@@ -83,6 +83,8 @@
     
     self.awesomeToolbar.frame = CGRectMake( width / 4 , ( 20 + browserHeight / 10 ) , width / 2 , browserHeight / 5 );
     
+    NSLog(@"the loading size is: %@", NSStringFromCGRect(self.awesomeToolbar.frame));
+    
 }
 
 #pragma mark - UITextFieldDelegate
@@ -190,7 +192,24 @@
     CGRect potentialNewFrame = CGRectMake(newPoint.x, newPoint.y, CGRectGetWidth(toolbar.frame), CGRectGetHeight(toolbar.frame));
     
     if ( CGRectContainsRect(self.view.bounds, potentialNewFrame) ) {
+        NSLog(@"The new size is %@", NSStringFromCGRect(potentialNewFrame));
         toolbar.frame = potentialNewFrame;
+    }
+}
+
+- (void) floatingToolbar:(AwesomeFloatingToolbar *)toolbar didTryToPinchWithScale:(CGFloat)scale {
+    
+    CGRect startingSize = toolbar.frame;
+    CGPoint startingPoint = toolbar.frame.origin;
+    CGRect newSize = CGRectMake(startingPoint.x, startingPoint.y, ( CGRectGetWidth(startingSize) * ( 1 + scale / 100 ) ), ( CGRectGetHeight(startingSize) * ( 1 + scale / 100 ) ));
+    
+    CGRect potentialNewFrame = newSize;
+    
+    if ( CGRectContainsRect(self.view.bounds, potentialNewFrame) ) {
+        NSLog(@"The new size is %@", NSStringFromCGRect(potentialNewFrame));
+        toolbar.frame = potentialNewFrame;
+    } else {
+        NSLog(@"Frame expanding, but too big");
     }
 }
 
