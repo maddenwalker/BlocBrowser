@@ -17,6 +17,7 @@
 @property (strong, nonatomic) UITapGestureRecognizer *tapGesture;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
 @property (strong, nonatomic) UIPinchGestureRecognizer *pinchGesture;
+@property (strong, nonatomic) UILongPressGestureRecognizer *pressGesture;
 
 @end
 
@@ -70,6 +71,8 @@
         [self addGestureRecognizer:self.panGesture];
         self.pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchFired:)];
         [self addGestureRecognizer:self.pinchGesture];
+        self.pressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(pressFired:)];
+        [self addGestureRecognizer:self.pressGesture];
     }
     
     return self;
@@ -160,6 +163,12 @@
     }
 }
 
+- (void) pressFired:(UILongPressGestureRecognizer *)recognizer {
+    if ( recognizer.state == UIGestureRecognizerStateRecognized ) {
+        [self changeButtonColors];
+    }
+}
+
  #pragma mark - Button Enabling
 
 - (void) setEnabled:(BOOL)enabled forButtonWithTile:(NSString *)title {
@@ -173,6 +182,23 @@
         } else {
             label.alpha = 0.25;
         }
+    }
+}
+
+#pragma mark - helper methods
+
+- (void) changeButtonColors {
+    NSUInteger numberOfColors = self.colors.count;
+    for (UILabel *thisLabel in self.labels) {
+        UIColor *thisLabelColor = [thisLabel backgroundColor];
+        NSUInteger indexOfColor = [self.colors indexOfObject:thisLabelColor];
+
+        if ( indexOfColor < ( numberOfColors - 1 ) ) {
+             thisLabel.backgroundColor = [self.colors objectAtIndex: indexOfColor + 1 ];
+        } else {
+            thisLabel.backgroundColor = [self.colors objectAtIndex:0];
+        }
+        
     }
 }
 
