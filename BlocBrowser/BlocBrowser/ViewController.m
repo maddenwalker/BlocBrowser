@@ -81,9 +81,10 @@
     self.textField.frame = CGRectMake(0, 0, width, itemHeight);
     self.webView.frame = CGRectMake(0, CGRectGetMaxY(self.textField.frame), width, browserHeight);
     
-    self.awesomeToolbar.frame = CGRectMake( width / 4 , ( 20 + browserHeight / 10 ) , width / 2 , browserHeight / 5 );
-    
-    NSLog(@"the loading size is: %@", NSStringFromCGRect(self.awesomeToolbar.frame));
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        self.awesomeToolbar.frame = CGRectMake( width / 4 , ( 20 + browserHeight / 10 ) , width / 2 , browserHeight / 5 );
+    });
     
 }
 
@@ -172,7 +173,10 @@
 
 #pragma mark - AwesomeFloatingToolbarDelegate
 
-- (void) floatingToolbar:(AwesomeFloatingToolbar *)toolbar didSelectButtonWithTitle:(NSString *)title {
+- (void) floatingToolbar:(AwesomeFloatingToolbar *)toolbar didTapButton:(UIButton *)button {
+    
+    NSString *title = button.titleLabel.text;
+    NSLog(@"%@", title);
     
     if ( [title isEqualToString:kWebBrowserBackString] ) {
         [self.webView goBack];
@@ -201,12 +205,9 @@
     
     CGRect startingSize = toolbar.frame;
     CGPoint startingPoint = toolbar.frame.origin;
-    CGRect newSize = CGRectMake(startingPoint.x, startingPoint.y, ( CGRectGetWidth(startingSize) * ( 1 + scale / 100 ) ), ( CGRectGetHeight(startingSize) * ( 1 + scale / 100 ) ));
-    
-    CGRect potentialNewFrame = newSize;
+    CGRect potentialNewFrame = CGRectMake(startingPoint.x, startingPoint.y, ( CGRectGetWidth(startingSize) * ( 1 + scale / 100 ) ), ( CGRectGetHeight(startingSize) * ( 1 + scale / 100 ) ));
     
     if ( CGRectContainsRect(self.view.bounds, potentialNewFrame) ) {
-        NSLog(@"The new size is %@", NSStringFromCGRect(potentialNewFrame));
         toolbar.frame = potentialNewFrame;
     } else {
         NSLog(@"Frame expanding, but too big");
